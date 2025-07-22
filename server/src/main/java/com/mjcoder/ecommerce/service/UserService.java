@@ -22,10 +22,9 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtUtil jwtUtil; // This dependency is now correct
+    private JwtUtil jwtUtil; 
 
     public void register(RegisterRequest request) {
-        // ... (no changes here)
         if(userRepository.existsByUsername(request.getUsername()))
             throw new RuntimeException("Username already taken");
         if(userRepository.existsByEmail(request.getEmail()))

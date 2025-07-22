@@ -13,17 +13,18 @@ export default function Navbar() {
     { href: "/products", label: "Products" },
   ];
 
-  if (token) {
-    navLinks.push({ href: "/cart", label: "Cart" });
-  }
-  if (user?.role === "ADMIN") {
-    navLinks.push({ href: "/admin", label: "Admin" });
+  if (user && token) {
+    if (user.role === "USER") {
+      navLinks.push({ href: "/cart", label: "Cart" });
+    }
+    if (user.role === "ADMIN") {
+      navLinks.push({ href: "/admin", label: "Admin" });
+    }
   }
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
-        {/* Logo & Main Links */}
         <div className="flex items-center gap-8">
           <Link href="/" className="text-xl font-bold text-gray-800">
             Mini Store 🛍️
@@ -50,7 +51,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          {token ? (
+          {token && user ? (
             <>
               <span className="text-sm text-gray-600 hidden sm:block">
                 Hello, {user.username}

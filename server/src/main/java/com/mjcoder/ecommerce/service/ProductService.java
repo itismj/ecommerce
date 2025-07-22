@@ -4,8 +4,12 @@ import com.mjcoder.ecommerce.model.Product;
 import com.mjcoder.ecommerce.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.mjcoder.ecommerce.repository.CartItemRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+
 
 @Service
 public class ProductService {
@@ -13,28 +17,45 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
     public Product addProduct(Product product) {
-        return productRepository.save(product);
-    }
 
-    public Product updateProduct(Long id, Product updatedProduct) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        product.setName(updatedProduct.getName());
-        product.setDescription(updatedProduct.getDescription());
-        product.setPrice(updatedProduct.getPrice());
-        product.setQuantity(updatedProduct.getQuantity());
-        product.setImageUrl(updatedProduct.getImageUrl());
-
-        return productRepository.save(product);
-    }
-
-    public void deleteProduct(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found");
+        if (product.getQuantity() == 0) {
+            product.setQuantity(1);
         }
-        productRepository.deleteById(id);
+        return productRepository.save(product);
+    }
+
+    public Product updateProduct(Long id, Product updatedProductDetails) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        Optional.ofNullable(updatedProductDetails.getName()).ifPresent(existingProduct::setName);
+        Optional.ofNullable(updatedProductDetails.getDescription()).ifPresent(existingProduct::setDescription);
+        Optional.ofNullable(updatedProductDetails.getImageUrl()).ifPresent(existingProduct::setImageUrl);
+
+        if (updatedProductDetails.getPrice() > 0) {
+            existingProduct.setPrice(updatedProductDetails.getPrice());
+        }
+        
+        if (updatedProductDetails.getQuantity() >= 0) {
+            existingProduct.setQuantity(updatedProductDetails.getQuantity());
+        }
+
+
+        return productRepository.save(existingProduct);
+    }
+
+    @Transactional 
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        cartItemRepository.deleteByProduct(product);
+
+        productRepository.delete(product);
     }
 
     public List<Product> getAllProducts() {

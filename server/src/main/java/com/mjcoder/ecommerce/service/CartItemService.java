@@ -8,6 +8,9 @@ import com.mjcoder.ecommerce.repository.ProductRepository;
 import com.mjcoder.ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.mjcoder.ecommerce.dto.CartItemResponse; 
+import java.util.stream.Collectors;
+
 
 import java.util.List;
 
@@ -23,9 +26,16 @@ public class CartItemService {
     @Autowired
     private ProductRepository productRepository;
 
-    public List<CartItem> getUserCart(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow();
-        return cartItemRepository.findByUser(user);
+    public List<CartItemResponse> getUserCart(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        List<CartItem> cartItems = cartItemRepository.findByUser(user);
+
+        // Convert each CartItem entity into a CartItemResponse DTO
+        return cartItems.stream()
+                .map(CartItemResponse::new) 
+                .collect(Collectors.toList());
     }
 
     public void addToCart(String username, Long productId, int quantity) {

@@ -1,15 +1,16 @@
 package com.mjcoder.ecommerce.controller;
 
 import com.mjcoder.ecommerce.dto.CartRequest;
-import com.mjcoder.ecommerce.model.CartItem;
 import com.mjcoder.ecommerce.service.CartItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.mjcoder.ecommerce.dto.CartItemResponse;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/cart")
@@ -21,7 +22,7 @@ public class CartController {
 
     // Get cart items for current user
     @GetMapping
-    public ResponseEntity<List<CartItem>> getCart(Authentication authentication) {
+    public ResponseEntity<List<CartItemResponse>> getCart(Authentication authentication) {
         String username = authentication.getName();
         return ResponseEntity.ok(cartItemService.getUserCart(username));
     }
