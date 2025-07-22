@@ -3,16 +3,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
-
-type Product = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-};
+import { addToCart } from "@/services/cart";
+import { Product } from "@/types";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+
   const { token } = useAuth();
 
   useEffect(() => {
@@ -23,18 +19,13 @@ export default function ProductsPage() {
   }, []);
 
   const handleAddToCart = async (productId: number) => {
-    if (!token) return alert("You must be logged in to add to cart");
+    if (!token) {
+      alert("You must be logged in to add to cart");
+      return;
+    }
 
     try {
-      await axios.post(
-        `http://localhost:8080/api/cart/add`,
-        { productId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await addToCart(productId, 1, token);
       alert("Added to cart!");
     } catch (err) {
       console.error("Failed to add to cart:", err);

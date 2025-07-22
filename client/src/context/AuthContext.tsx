@@ -14,7 +14,7 @@ type AuthContextType = {
   token: string | null;
   login: (token: string) => void;
   logout: () => void;
-  loading: boolean; // <---- add loading flag here
+  loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); // <---- loading state
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const decoded: any = jwtDecode(storedToken);
       setUser(decoded);
     }
-    setLoading(false); // <---- done loading token
+    setLoading(false);
   }, []);
 
   const login = (newToken: string) => {

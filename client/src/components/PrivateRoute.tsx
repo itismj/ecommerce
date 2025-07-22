@@ -15,7 +15,6 @@ export default function PrivateRoute({ children, requiredRole }: Props) {
 
   useEffect(() => {
     if (!loading) {
-      // <-- wait until loading finishes
       if (!token) {
         router.push("/login");
       } else if (requiredRole && user?.role !== requiredRole) {
@@ -25,7 +24,7 @@ export default function PrivateRoute({ children, requiredRole }: Props) {
   }, [token, user, loading]);
 
   if (loading) {
-    return <div>Loading...</div>; // Or a spinner component
+    return <div>Loading...</div>;
   }
 
   if (!token || (requiredRole && user?.role !== requiredRole)) {

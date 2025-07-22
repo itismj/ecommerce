@@ -1,4 +1,3 @@
-// app/register/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -17,7 +16,7 @@ export default function RegisterPage() {
         username: form.username,
         email: form.email,
         password: form.password,
-        role: "USER", // or ADMIN if needed
+        role: "USER",
       });
       router.push("/login");
     } catch (err: any) {

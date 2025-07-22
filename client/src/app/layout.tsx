@@ -1,7 +1,6 @@
-// src/app/layout.tsx
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
-import Navbar from "@/components/Navbar"; // ✅ updated import
+import Navbar from "@/components/Navbar";
 
 export const metadata = {
   title: "Mini Store",

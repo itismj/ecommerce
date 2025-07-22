@@ -5,16 +5,18 @@ import { useAuth } from "@/context/AuthContext";
 import { getCartItems, removeFromCart } from "@/services/cart";
 import { useEffect, useState } from "react";
 
-type Product = {
-  id: number;
+type CartItem = {
+  productId: number;
   name: string;
   description: string;
   price: number;
+  quantity: number;
 };
 
 export default function CartPage() {
   const { token } = useAuth();
-  const [cartItems, setCartItems] = useState<Product[]>([]);
+
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   const fetchCart = async () => {
     if (!token) return;
@@ -22,43 +24,63 @@ export default function CartPage() {
     setCartItems(items);
   };
 
-  const handleRemove = async (id: number) => {
+  const handleRemove = async (productId: number) => {
     if (!token) return;
-    await removeFromCart(id, token);
-    fetchCart(); // refresh cart
+
+    await removeFromCart(productId, token);
+    fetchCart();
   };
 
   useEffect(() => {
     fetchCart();
   }, [token]);
 
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
   return (
     <PrivateRoute>
-      <div className="p-4">
+      <div className="p-4 max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">🛒 Your Cart</h1>
         {cartItems.length === 0 ? (
           <p>Your cart is empty.</p>
         ) : (
-          <ul className="space-y-2">
-            {cartItems.map((item) => (
-              <li
-                key={item.id}
-                className="border p-2 rounded flex justify-between"
-              >
-                <div>
-                  <p className="font-semibold">{item.name}</p>
-                  <p className="text-sm">{item.description}</p>
-                  <p className="text-sm text-green-600">${item.price}</p>
-                </div>
-                <button
-                  onClick={() => handleRemove(item.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
+          <div>
+            <ul className="space-y-3">
+              {cartItems.map((item) => (
+                <li
+                  key={item.productId}
+                  className="border p-3 rounded flex justify-between items-center bg-white shadow-sm"
                 >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
+                  <div>
+                    <p className="font-semibold">{item.name}</p>
+                    <p className="text-sm text-gray-500">{item.description}</p>
+
+                    <p className="text-sm">
+                      ${item.price.toFixed(2)} x {item.quantity}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-lg text-green-600">
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </p>
+                    <button
+                      onClick={() => handleRemove(item.productId)}
+                      className="text-red-500 hover:underline text-sm mt-1"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="text-right font-bold text-xl mt-4 border-t pt-4">
+              Total: ${totalPrice.toFixed(2)}
+            </div>
+          </div>
         )}
       </div>
     </PrivateRoute>
